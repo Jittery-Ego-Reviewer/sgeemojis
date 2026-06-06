@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Narrative Builder | 敘事小幫手</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes popIn {
+      0% { transform: scale(0.1); opacity: 0; }
+      60% { transform: scale(1.25); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes floatLeft {
+      0% { transform: translateX(-100px) translateY(0px); }
+      50% { transform: translateX(50vw) translateY(-10px); }
+      100% { transform: translateX(100vw) translateY(0px); }
+    }
+    @keyframes floatRight {
+      0% { transform: translateX(100vw) translateY(0px); }
+      50% { transform: translateX(50vw) translateY(15px); }
+      100% { transform: translateX(-100px) translateY(0px); }
+    }
+    @keyframes rainFall {
+      0% { transform: translateY(-100px) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(115vh) rotate(360deg); opacity: 0; }
+    }
+    .pop-animation {
+      animation: popIn 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    .animate-float-left {
+      animation: floatLeft 45s linear infinite;
+    }
+    .animate-float-right {
+      animation: floatRight 60s linear infinite;
+    }
+    .emoji-rain-item {
+      position: absolute;
+      top: -10vh;
+      animation: rainFall linear infinite;
+      pointer-events: none;
+      z-index: 40;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-sky-300 via-blue-200 to-indigo-100 text-slate-800 font-sans relative overflow-x-hidden flex flex-col">
+
+  <!-- Floating Background Clouds -->
+  <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="absolute top-[12%] left-[-10%] opacity-40 animate-float-left">
+      <svg class="w-32 sm:w-48 text-white fill-current" viewBox="0 0 100 40">
+        <path d="M 20,30 C 15,30 10,25 10,20 C 10,14 16,10 22,12 C 25,7 32,5 38,8 C 43,4 51,5 55,10 C 60,6 68,8 70,14 C 76,14 80,18 80,24 C 80,29 75,34 68,34" />
+      </svg>
+    </div>
+    <div class="absolute top-[45%] right-[-10%] opacity-35 animate-float-right">
+      <svg class="w-40 sm:w-56 text-white fill-current" viewBox="0 0 100 40">
+        <path d="M 15,25 C 15,20 20,15 25,15 C 28,10 35,8 42,11 C 47,6 55,7 60,12 C 65,8 72,10 75,16 C 82,16 86,21 86,27 C 86,33 80,38 72,38" />
+      </svg>
+    </div>
+    <div class="absolute bottom-[10%] left-[-15%] opacity-50 animate-float-left">
+      <svg class="w-28 sm:w-40 text-white fill-current" viewBox="0 0 100 40">
+        <path d="M 20,30 C 15,30 10,25 10,20 C 10,14 16,10 22,12 C 25,7 32,5 38,8 C 43,4 51,5 55,10 C 60,6 68,8 70,14 C 76,14 80,18 80,24 C 80,29 75,34 68,34" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="bg-white/80 backdrop-blur-md px-4 sm:px-6 py-4 shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center shadow-md text-white">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.5 2A2.5 2.5 0 0112 4.5v15a2.5 2.5 0 01-4.96-.44M14.5 2A2.5 2.5 0 0012 4.5v15a2.5 2.5 0 004.96-.44" />
+          </svg>
+        </div>
+        <h1 class="text-lg sm:text-2xl font-black text-indigo-950 tracking-tight">
+          Narrative Builder <span class="hidden sm:inline font-bold text-indigo-500 text-lg">| 敘事小幫手</span>
+        </h1>
+      </div>
+
+      <div class="flex items-center space-x-2 sm:space-x-4">
+        <!-- Sound Toggle Button -->
+        <button id="sound-btn" class="p-2 sm:p-2.5 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-900 transition-colors" title="切換音效">
+          <svg id="sound-on-icon" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"/></svg>
+          <svg id="sound-off-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6L11.47 3.53a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"/></svg>
+        </button>
+
+        <!-- View Controls (Interactive Game state only) -->
+        <div id="game-controls" class="flex items-center space-x-2 sm:space-x-4 hidden">
+          <button id="finish-btn" class="flex items-center px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white font-black rounded-full transition-all duration-200 shadow-md hover:scale-105 active:scale-95 text-xs sm:text-sm tracking-wide">
+            <svg class="w-4 h-4 mr-1 sm:mr-1.5 animate-bounce" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+            <span>完成 Story!</span>
+          </button>
+          <button id="back-btn" class="flex items-center p-2 sm:px-4 sm:py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-full transition-colors shadow-sm text-xs sm:text-sm">
+            <svg class="w-4 h-4 sm:mr-2" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+            <span class="hidden sm:inline">Back</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Wrapper -->
+  <main class="max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 relative z-10 flex-1 flex flex-col justify-center">
+    
+    <!-- MENU VIEW (Customization Selection Page) -->
+    <div id="menu-view" class="space-y-6 w-full max-w-4xl mx-auto">
+      
+      <!-- Core elements section container -->
+      <div id="core-selection-container" class="bg-white/80 backdrop-blur-md rounded-3xl p-5 shadow-md border border-sky-100">
+        <div id="core-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
+      </div>
+
+      <!-- Additional elements section container -->
+      <div id="additional-selection-container" class="bg-white/80 backdrop-blur-md rounded-3xl p-5 shadow-md border border-sky-100">
+        <div id="additional-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="flex justify-center pt-6 pb-12">
+        <button id="start-story-btn" class="flex items-center px-8 py-4 rounded-full text-xl font-bold shadow-xl transition-all duration-300 bg-indigo-600 hover:bg-indigo-500 hover:-translate-y-1 text-white shadow-indigo-300">
+          <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l5.096-.813a2 2 0 001.317-.685l7.525-7.525a2.121 2.121 0 10-3-3l-7.525 7.525a2 2 0 00-.685 1.317zM4.5 18H15M4.5 13.5H12m-7.5-9h15"/></svg>
+          <span id="start-btn-label">開始説故事</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- GAME VIEW (The actual customizable grids) -->
+    <div id="game-view" class="w-full hidden">
+      <div id="boxes-grid" class="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <!-- Dynmically loaded game cards -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- CELEBRATION MODAL OVERLAY -->
+  <div id="celebration-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden overflow-hidden">
+    <!-- Overlay/Background Falling Rain Container -->
+    <div id="rain-container" class="absolute inset-0 pointer-events-none overflow-hidden z-30"></div>
+
+    <div class="bg-white rounded-[2rem] shadow-2xl p-8 max-w-md w-full text-center relative overflow-hidden border-8 border-indigo-400/50 z-50">
+      <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-amber-400">
+        <svg class="w-12 h-12 text-amber-500 animate-bounce" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.375M16.5 18.75V9m-7.5 9.75V9m0 9.75h-.375c-.621 0-1.125-.504-1.125-1.125V14.25m4.125-5.25h5.25c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125h-5.25c-.621 0-1.125.504-1.125 1.125v2.25c0 .621.504 1.125 1.125 1.125zm-8.25 0h5.25c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H6.375c-.621 0-1.125.504-1.125 1.125v2.25c0 .621.504 1.125 1.125 1.125z"/></svg>
+      </div>
+
+      <h3 class="text-2xl sm:text-3xl font-black text-indigo-950 mb-2">太棒了！</h3>
+      <p class="text-slate-600 font-bold mb-6 text-sm sm:text-base leading-relaxed">
+        你成功完成了精彩的故事！<br />
+        給自己鼓鼓掌吧！👏👏👏
+      </p>
+
+      <div class="flex flex-col space-y-2">
+        <button id="modal-back-btn" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold rounded-full transition-colors shadow-md text-base">
+          返回
+        </button>
+        <button id="modal-reset-btn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold rounded-full transition-colors text-base">
+          重設元素
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- DATABASE CONFIGURATION ---
+    const EMOJI_DATA = {
+      time: ['☀️', '🌧️', '❄️', '⏰', '🌙', '🌅', '🌈', '⛈️', '🎄', '🌸', '🔔', '🎆', '📅', '🌃', '🌄', '🌤️', '🌞', '🌠'],
+      place: ['🏫', '🏞️', '🏰', '🏝️', '🏠', '🏥', '🏕️', '🎡', '🏮', '🕳️', '🗻', '🏟️', '🏖️', '🏜️', '🏢', '🏪', '⛲', '🏯', '🗽', '🗼', '💒', '🏦', '🎢', '🛤️', '🛣️'],
+      character: ['👦', '👧', '🧙‍♂️', '🐶', '🐱', '🐉', '🦸🏻‍♂️', '🧌', '🧜🏻', '🥷🏻', '🧑🏻‍🚀', '🧑‍🚒', '👩🏻‍🎨', '🧑🏻‍🔬', '👨🏻‍🏫', '👨‍🍳', '🧑🏻‍⚕️', '🤖', '👽', '👸', '👻', '🤡', '🎅', '🦉', '👨', '👩', '🧑', '🧛', '🧟', '🧞'],
+      cause: ['💥', '🎁', '🌪️', '💌', '🛸', '🪄', '🌋', '🗝️', '🚨', '💣', '🐛', '🪳', '🦟', '🕷️', '🐙', '🍎', '🔥', '⚡', '🧨', '🧪', '🦈', '🐊', '🐀', '☔', '💬', '🧲', '🧩', '🫆', '👣', '🫟'],
+      internalresponse: ['😲', '😨', '🤔', '🤩', '😠', '🥺', '😱', '😡', '🤯', '😂', '😜', '🤪', '😏', '😅', '🤤', '😴', '😩', '🙄', '😮‍💨', '😭'],
+      plan: ['💭', '🧭', '📖', '🔍', '🗺️', '📚', '🗒️', '🧾', '🗓️', '🧍🏻‍♀️', '🧍🏻', '🧑‍🏫', '🧑‍💻', '⛱️', '📱', '📷', '🔋', '🧯', '🔦', '🕯️', '💵', '🔨', '🧹', '🧼', '🧻', '🗝️', '🛒', '🪞', '🗑️', '🖊️', '✂️', '📢', '🏳️', '🏃🏻‍♀️', '🏃🏻'],
+      attempt: ['🏃', '🏊', '🧗', '🚣', '🕵️', '🤺', '🛠️', '🗣️', '🦸', '🚶', '🚴', '🏇', '🏌️', '🏂', '🏄', '🧘', '🧍', '🧎', '🕺', '💃', '💭', '🧭', '📖', '🔍', '🗺️', '📚', '🗒️', '🧾', '🗓️', '🧑‍🏫', '🧑‍💻', '⛱️', '📱', '📷', '🔋', '🧯', '🔦', '🕯️', '💵', '🔨', '🧹', '🧼', '🧻', '🗝️', '🛒', '🪞', '🗑️', '🖊️', '✂️', '📢', '🏳️', '🏃🏻‍♀️', '🏃🏻'],
+      consequence: ['🎉', '🏆', '💀', '🩹', '🤝', '💖', '🥇', '🧧', '🥈', '🥉', '🏅', '🪙', '🔓'],
+      feelings: ['😭', '🥰', '🥳', '😲', '😨', '🤔', '🤩', '😠', '🥺', '😱', '😡', '🤯', '😂', '😜', '🤪', '😏', '😅', '🤤', '😴', '😩', '🙄', '😮‍💨'],
+      reflection: ['💭', '🤔'],
+      thought: ['💭', '🧠'],
+      dialogue: ['💬', '🗣️', '🗨️', '🗯️'],
+      connective: ['🔗', '➡️', '➕', '〰️', '🧵']
+    };
+    // Setting combined from Time, Place and Character
+    EMOJI_DATA.setting = [...EMOJI_DATA.time, ...EMOJI_DATA.place, ...EMOJI_DATA.character];
+
+    const ELEMENTS_CONFIG = [
+      // Core Elements
+      { id: 'time', label: '時間', enLabel: 'Time', type: 'core', color: 'bg-amber-100/90 border-amber-400 text-amber-800', svgPath: `<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>` },
+      { id: 'place', label: '地點', enLabel: 'Place', type: 'core', color: 'bg-emerald-100/90 border-emerald-400 text-emerald-800', svgPath: `<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>` },
+      { id: 'character', label: '人物', enLabel: 'Character', type: 'core', color: 'bg-blue-100/90 border-blue-400 text-blue-800', svgPath: `<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>` },
+      { id: 'problem', label: '起因', enLabel: 'Problem', type: 'core', color: 'bg-red-100/90 border-red-400 text-red-800', dataKey: 'cause', svgPath: `<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>` },
+      { id: 'setting', label: '背景', enLabel: 'Setting', type: 'core', color: 'bg-teal-100/90 border-teal-400 text-teal-800', svgPath: `<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>` },
+      { id: 'internalresponse', label: '反應', enLabel: 'Internal Response', type: 'core', color: 'bg-indigo-100/90 border-indigo-400 text-indigo-800', svgPath: `<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9.5 2A2.5 2.5 0 0112 4.5v15a2.5 2.5 0 01-4.96-.44M14.5 2A2.5 2.5 0 0012 4.5v15a2.5 2.5 0 004.96-.44"/></svg>` },
+      { id: 'plan', label: '計劃', enLabel: 'Plan', type: 'core', color: 'bg-cyan-100/90 border-cyan-400 text-cyan-800', svgPath: `<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 14h6M9 18h6M10 10h4"/></svg>` },
+      { id: 'attempt', label: '行動', enLabel: 'Attempt', type: 'core', color: 'bg-orange-100/90 border-orange-400 text-orange-800', svgPath: `<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>` },
+      { id: 'consequence', label: '結果', enLabel: 'Consequence', type: 'core', color: 'bg-rose-100/90 border-rose-400 text-rose-800', svgPath: `<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></svg>` },
+      { id: 'feelings', label: '感受', enLabel: 'Feelings', type: 'core', color: 'bg-pink-100/90 border-pink-400 text-pink-800', svgPath: `<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>` },
+      { id: 'reflection', label: '反思/道理', enLabel: 'Reflection', type: 'core', color: 'bg-violet-100/90 border-violet-400 text-violet-800', svgPath: `<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>` },
+      // Additional Elements
+      { id: 'thought', label: '想法', enLabel: 'Thought', type: 'additional', color: 'bg-fuchsia-100/90 border-fuchsia-400 text-fuchsia-800', svgPath: `<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9.813 15.904L9 21l5.096-.813a2 2 0 001.317-.685l7.525-7.525a2.121 2.121 0 10-3-3l-7.525 7.525a2 2 0 00-.685 1.317zM4.5 18H15M4.5 13.5H12m-7.5-9h15"/></svg>` },
+      { id: 'dialogue', label: '對話', enLabel: 'Dialogue', type: 'additional', color: 'bg-sky-100/90 border-sky-400 text-sky-800', svgPath: `<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>` },
+      { id: 'connective', label: '連接詞', enLabel: 'Connectives', type: 'additional', color: 'bg-stone-100/90 border-stone-400 text-stone-800', svgPath: `<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>` }
+    ];
+
+    // --- APP STATE ---
+    let selectedElements = ['time', 'place', 'character', 'problem'];
+    let boxContents = {}; // maps boxId -> Array of emojis
+    let isSoundEnabled = true;
+
+    // Initialize Box Contents arrays
+    ELEMENTS_CONFIG.forEach(elem => {
+      boxContents[elem.id] = [];
+    });
+
+    // --- AUDIO GENERATOR ---
+    let audioCtx = null;
+
+    const initAudio = () => {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          audioCtx = new AudioContext();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    };
+
+    const playPopSound = (pitchMultiplier = 1) => {
+      if (!isSoundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.type = 'sine';
+        
+        const startFreq = 550 * pitchMultiplier;
+        const endFreq = 160 * pitchMultiplier;
+        
+        osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + 0.08);
+        
+        gainNode.gain.setValueAtTime(0.25, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+        
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.08);
+      } catch (e) {
+        console.error("Audio playback error", e);
+      }
+    };
+
+    const playCelebrationSound = () => {
+      if (!isSoundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+      try {
+        const now = audioCtx.currentTime;
+        const playTone = (freq, startTime, duration) => {
+          const osc = audioCtx.createOscillator();
+          const gainNode = audioCtx.createGain();
+          
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, startTime);
+          
+          gainNode.gain.setValueAtTime(0.15, startTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+          
+          osc.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+          
+          osc.start(startTime);
+          osc.stop(startTime + duration);
+        };
+
+        playTone(523.25, now, 0.45);        // C5
+        playTone(659.25, now + 0.1, 0.45);  // E5
+        playTone(783.99, now + 0.2, 0.45);  // G5
+        playTone(1046.50, now + 0.3, 0.7);  // C6
+        playTone(1318.51, now + 0.45, 0.8); // E6
+      } catch (e) {
+        console.error("Celebration audio error", e);
+      }
+    };
+
+    // --- UI HELPERS ---
+
+    // Generates the Image fallback system cleanly in JS DOM construction
+    const renderIconHTML = (id, fallbackSvg) => {
+      return `
+        <div class="relative w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center">
+          <img 
+            src="icons/${id}.png" 
+            alt="${id}" 
+            class="absolute inset-0 w-full h-full object-contain" 
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+          />
+          <div style="display: none;" class="w-full h-full text-current">
+            ${fallbackSvg}
+          </div>
+        </div>
+      `;
+    };
+
+    // --- VIEW MANAGEMENT ---
+
+    const showView = (viewName) => {
+      const menuView = document.getElementById('menu-view');
+      const gameView = document.getElementById('game-view');
+      const gameControls = document.getElementById('game-controls');
+
+      if (viewName === 'menu') {
+        menuView.classList.remove('hidden');
+        gameView.classList.add('hidden');
+        gameControls.classList.add('hidden');
+      } else {
+        menuView.classList.add('hidden');
+        gameView.classList.remove('hidden');
+        gameControls.classList.remove('hidden');
+        renderGameLayout();
+      }
+    };
+
+    // --- MENU INTERFACE GENERATION ---
+
+    const renderMenuSelection = () => {
+      const coreGrid = document.getElementById('core-grid');
+      const additionalGrid = document.getElementById('additional-grid');
+      
+      coreGrid.innerHTML = '';
+      additionalGrid.innerHTML = '';
+
+      ELEMENTS_CONFIG.forEach(config => {
+        const isSelected = selectedElements.includes(config.id);
+        const button = document.createElement('button');
+        button.className = `flex items-center p-3.5 rounded-2xl border-2 transition-all duration-200 text-left ${
+          isSelected 
+            ? `${config.color.split(' ')[0]} ${config.color.split(' ')[1]} shadow-sm scale-[1.01]` 
+            : 'bg-sky-50/50 border-sky-100/60 text-sky-900 hover:bg-sky-100/50'
+        }`;
+
+        button.innerHTML = `
+          <div class="flex items-center justify-center w-6 h-6 rounded-md mr-3 ${isSelected ? 'bg-white shadow-sm' : 'bg-sky-100/50'}">
+            ${isSelected ? `<svg class="w-4 h-4 ${config.color.split(' ')[2]}" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>` : ''}
+          </div>
+          <div class="flex items-center space-x-2 overflow-hidden select-none">
+            ${renderIconHTML(config.id, config.svgPath)}
+            <span class="font-bold text-sm whitespace-nowrap">${config.label}</span>
+          </div>
+        `;
+
+        button.addEventListener('click', () => {
+          if (selectedElements.includes(config.id)) {
+            selectedElements = selectedElements.filter(e => e !== config.id);
+          } else {
+            selectedElements.push(config.id);
+          }
+          renderMenuSelection();
+          updateStartButtonState();
+        });
+
+        if (config.type === 'core') {
+          coreGrid.appendChild(button);
+        } else {
+          additionalGrid.appendChild(button);
+        }
+      });
+    };
+
+    const updateStartButtonState = () => {
+      const startBtn = document.getElementById('start-story-btn');
+      if (selectedElements.length > 0) {
+        startBtn.disabled = false;
+        startBtn.className = 'flex items-center px-8 py-4 rounded-full text-xl font-bold shadow-xl transition-all duration-300 bg-indigo-600 hover:bg-indigo-500 hover:-translate-y-1 text-white shadow-indigo-300';
+      } else {
+        startBtn.disabled = true;
+        startBtn.className = 'flex items-center px-8 py-4 rounded-full text-xl font-bold shadow-xl transition-all duration-300 bg-slate-300/80 text-slate-500 cursor-not-allowed';
+      }
+    };
+
+    // --- GAME INTERFACE GENERATION ---
+
+    const renderGameLayout = () => {
+      const grid = document.getElementById('boxes-grid');
+      grid.innerHTML = '';
+
+      // Clean Responsive Column Layout
+      grid.className = 'grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2';
+      if (selectedElements.length >= 3) {
+        grid.className += ' lg:grid-cols-3';
+      }
+      if (selectedElements.length >= 8) {
+        grid.className += ' xl:grid-cols-4';
+      }
+
+      ELEMENTS_CONFIG.filter(e => selectedElements.includes(e.id)).forEach(config => {
+        const card = document.createElement('div');
+        card.id = `box-card-${config.id}`;
+        card.className = `relative flex flex-col rounded-2xl border-4 ${config.color} shadow-lg overflow-hidden min-h-[170px] sm:min-h-[210px] select-none touch-manipulation transition-all hover:shadow-xl active:scale-[0.98]`;
+
+        // Render card structure
+        card.innerHTML = `
+          <!-- Header Bar -->
+          <div class="flex items-center justify-between px-3 py-2 border-b-4 ${config.color.split(' ')[1]} bg-white/70 backdrop-blur-sm z-10">
+            <div class="flex items-center space-x-2">
+              ${renderIconHTML(config.id, config.svgPath)}
+              <span class="font-bold text-sm sm:text-base md:text-lg tracking-wide">
+                ${config.label} <span class="opacity-60 text-xs hidden sm:inline ml-1">${config.enLabel}</span>
+              </span>
+            </div>
+            <div class="flex items-center">
+              <button id="clear-btn-${config.id}" class="p-1 hover:bg-black/10 rounded-full transition-colors text-slate-700 hidden" title="清除盒子">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Body Grid (2x5 Grid for perfectly aligned emojis) -->
+          <div id="grid-body-${config.id}" class="flex-1 relative grid grid-cols-5 grid-rows-2 p-3 gap-2 bg-white/50 hover:bg-white/75 transition-colors cursor-pointer">
+            <div id="placeholder-${config.id}" class="absolute inset-0 flex items-center justify-center opacity-40 pointer-events-none z-10">
+              <p class="font-semibold text-sm tracking-wider text-slate-600">Tap to play 🌟</p>
+            </div>
+            <!-- Slots -->
+            ${Array.from({ length: 10 }).map((_, index) => `
+              <div id="slot-${config.id}-${index}" class="flex items-center justify-center relative w-full h-full"></div>
+            `).join('')}
+          </div>
+        `;
+
+        grid.appendChild(card);
+
+        // Bind Clear functionality
+        const clearBtn = card.querySelector(`#clear-btn-${config.id}`);
+        clearBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          boxContents[config.id] = [];
+          updateBoxDisplay(config.id);
+        });
+
+        // Bind Tap to Drop functionality
+        const body = card.querySelector(`#grid-body-${config.id}`);
+        body.addEventListener('click', () => {
+          const currentEmojis = boxContents[config.id];
+          if (currentEmojis.length >= 10) return;
+
+          playPopSound(1 + (currentEmojis.length * 0.06));
+
+          const emojiPool = EMOJI_DATA[config.dataKey || config.id] || ['❓'];
+          const randomEmoji = emojiPool[Math.floor(Math.random() * emojiPool.length)];
+          
+          currentEmojis.push(randomEmoji);
+          updateBoxDisplay(config.id);
+        });
+
+        // Initialize state view for current card values
+        updateBoxDisplay(config.id);
+      });
+    };
+
+    const updateBoxDisplay = (boxId) => {
+      const contents = boxContents[boxId];
+      const placeholder = document.getElementById(`placeholder-${boxId}`);
+      const clearBtn = document.getElementById(`clear-btn-${boxId}`);
+
+      // Placeholder view state
+      if (contents.length > 0) {
+        placeholder.style.display = 'none';
+        clearBtn.classList.remove('hidden');
+      } else {
+        placeholder.style.display = 'flex';
+        clearBtn.classList.add('hidden');
+      }
+
+      // Populate grid slots
+      for (let i = 0; i < 10; i++) {
+        const slot = document.getElementById(`slot-${boxId}-${i}`);
+        slot.innerHTML = '';
+        if (contents[i]) {
+          const span = document.createElement('span');
+          span.className = 'text-3xl sm:text-4xl md:text-5xl drop-shadow-md pop-animation select-none pointer-events-none';
+          span.style.lineHeight = '1';
+          span.innerText = contents[i];
+          slot.appendChild(span);
+        }
+      }
+    };
+
+    // --- CELEBRATION CONFLICTS / EFFECT SYSTEMS ---
+
+    const spawnEmojiRain = () => {
+      const container = document.getElementById('rain-container');
+      container.innerHTML = '';
+      const pool = ['🎉', '🌟', '✨', '🎂', '🏆', '🎈'];
+
+      for (let i = 0; i < 40; i++) {
+        const item = document.createElement('div');
+        const randomEmoji = pool[Math.floor(Math.random() * pool.length)];
+        const leftOffset = Math.random() * 95;
+        const delay = Math.random() * 4;
+        const duration = 3 + Math.random() * 3;
+        const fontSize = 1.5 + Math.random() * 2;
+
+        item.className = 'emoji-rain-item';
+        item.style.left = `${leftOffset}%`;
+        item.style.animationDelay = `${delay}s`;
+        item.style.animationDuration = `${duration}s`;
+        item.style.fontSize = `${fontSize}rem`;
+        item.innerText = randomEmoji;
+
+        container.appendChild(item);
+      }
+    };
+
+    // --- APP EVENT REGISTRATION ---
+
+    document.getElementById('start-story-btn').addEventListener('click', () => {
+      showView('game');
+    });
+
+    document.getElementById('back-btn').addEventListener('click', () => {
+      showView('menu');
+    });
+
+    document.getElementById('finish-btn').addEventListener('click', () => {
+      playCelebrationSound();
+      spawnEmojiRain();
+      document.getElementById('celebration-modal').classList.remove('hidden');
+    });
+
+    // Modal Actions
+    document.getElementById('modal-back-btn').addEventListener('click', () => {
+      document.getElementById('celebration-modal').classList.add('hidden');
+    });
+
+    document.getElementById('modal-reset-btn').addEventListener('click', () => {
+      document.getElementById('celebration-modal').classList.add('hidden');
+      // Reset all boards when resetting
+      ELEMENTS_CONFIG.forEach(elem => {
+        boxContents[elem.id] = [];
+      });
+      showView('menu');
+    });
+
+    // Sound toggle handlers
+    document.getElementById('sound-btn').addEventListener('click', () => {
+      isSoundEnabled = !isSoundEnabled;
+      const onIcon = document.getElementById('sound-on-icon');
+      const offIcon = document.getElementById('sound-off-icon');
+      if (isSoundEnabled) {
+        onIcon.classList.remove('hidden');
+        offIcon.classList.add('hidden');
+      } else {
+        onIcon.classList.add('hidden');
+        offIcon.classList.remove('hidden');
+      }
+    });
+
+    // Initialize Menu Screen View on load
+    window.onload = () => {
+      renderMenuSelection();
+      updateStartButtonState();
+      showView('menu');
+    };
+  </script>
+</body>
+</html>
