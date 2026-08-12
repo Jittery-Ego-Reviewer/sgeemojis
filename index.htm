@@ -85,7 +85,7 @@
     </div>
   </div>
 
-  <!-- Confetti Canvas added from Analysis -->
+  <!-- Confetti Canvas -->
   <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-[60] hidden"></canvas>
 
   <!-- Header -->
@@ -102,11 +102,19 @@
 
       <div class="flex items-center space-x-2 sm:space-x-4">
         <!-- View Controls -->
-        <div id="game-controls" class="flex items-center space-x-2 sm:space-x-4 hidden">
-          <button id="finish-btn" class="tactile-btn flex items-center px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white font-black rounded-full shadow-md text-xs sm:text-sm tracking-wide">
+        <div id="game-controls" class="flex items-center space-x-2 sm:space-x-3 hidden">
+          <!-- Global Reveal Button -->
+          <button id="reveal-btn" class="tactile-btn flex items-center px-3 sm:px-4 py-2 bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-black rounded-full shadow-md text-xs sm:text-sm tracking-wide">
+            <span class="mr-1">✨</span>
+            <span class="hidden sm:inline">全部揭曉</span>
+            <span class="sm:hidden">揭曉</span>
+          </button>
+          
+          <button id="finish-btn" class="tactile-btn flex items-center px-3 sm:px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white font-black rounded-full shadow-md text-xs sm:text-sm tracking-wide">
             <svg class="w-4 h-4 mr-1 sm:mr-1.5 animate-bounce" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
             <span>完成!</span>
           </button>
+          
           <button id="back-btn" class="tactile-btn flex items-center p-2 sm:px-4 sm:py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-full shadow-sm text-xs sm:text-sm">
             <svg class="w-4 h-4 sm:mr-2" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
             <span class="hidden sm:inline">Back</span>
@@ -122,11 +130,13 @@
     <!-- MENU VIEW -->
     <div id="menu-view" class="space-y-6 w-full max-w-4xl mx-auto">
       <div id="core-selection-container" class="bg-white/80 backdrop-blur-md rounded-3xl p-5 shadow-lg border border-sky-100">
-        <div id="core-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        <h2 class="text-sm font-bold text-slate-400 mb-3 ml-2 uppercase tracking-wider">核心元素 (Core Elements)</h2>
+        <div id="core-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
       </div>
 
       <div id="additional-selection-container" class="bg-white/80 backdrop-blur-md rounded-3xl p-5 shadow-lg border border-sky-100">
-        <div id="additional-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        <h2 class="text-sm font-bold text-slate-400 mb-3 ml-2 uppercase tracking-wider">額外元素 (Additional Elements)</h2>
+        <div id="additional-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
       </div>
 
       <div class="flex justify-center pt-6 pb-12">
@@ -193,31 +203,31 @@
     EMOJI_DATA.setting = [...EMOJI_DATA.time, ...EMOJI_DATA.place, ...EMOJI_DATA.character];
 
     const ELEMENTS_CONFIG = [
-      { id: 'time', label: '時間', enLabel: 'Time', type: 'core', maxItems: 5, color: 'bg-amber-100/90 border-amber-400 text-amber-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>` },
-      { id: 'character', label: '人物', enLabel: 'Character', type: 'core', maxItems: 5, color: 'bg-blue-100/90 border-blue-400 text-blue-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>` },
-      { id: 'place', label: '地點', enLabel: 'Place', type: 'core', maxItems: 5, color: 'bg-emerald-100/90 border-emerald-400 text-emerald-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>` },
-      { id: 'setting', label: '背景', enLabel: 'Setting', type: 'core', maxItems: 10, color: 'bg-teal-100/90 border-teal-400 text-teal-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>` },
-      { id: 'problem', label: '起因', enLabel: 'Problem', type: 'core', maxItems: 10, dataKey: 'cause', color: 'bg-red-100/90 border-red-400 text-red-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>` },
-      { id: 'internalresponse', label: '反應', enLabel: 'Internal Response', type: 'core', maxItems: 10, color: 'bg-indigo-100/90 border-indigo-400 text-indigo-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9.5 2A2.5 2.5 0 0112 4.5v15a2.5 2.5 0 01-4.96-.44M14.5 2A2.5 2.5 0 0012 4.5v15a2.5 2.5 0 004.96-.44"/></svg>` },
-      { id: 'plan', label: '計劃', enLabel: 'Plan', type: 'core', maxItems: 10, color: 'bg-cyan-100/90 border-cyan-400 text-cyan-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 14h6M9 18h6M10 10h4"/></svg>` },
-      { id: 'attempt', label: '行動', enLabel: 'Attempt', type: 'core', maxItems: 10, color: 'bg-orange-100/90 border-orange-400 text-orange-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>` },
-      { id: 'consequence', label: '結果', enLabel: 'Consequence', type: 'core', maxItems: 10, color: 'bg-rose-100/90 border-rose-400 text-rose-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></svg>` },
-      { id: 'feelings', label: '感受', enLabel: 'Feelings', type: 'core', maxItems: 10, color: 'bg-pink-100/90 border-pink-400 text-pink-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>` },
-      { id: 'reflection', label: '反思/道理', enLabel: 'Reflection', type: 'core', maxItems: 10, color: 'bg-violet-100/90 border-violet-400 text-violet-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>` },
-      { id: 'thought', label: '想法', enLabel: 'Thought', type: 'additional', maxItems: 10, color: 'bg-fuchsia-100/90 border-fuchsia-400 text-fuchsia-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9.813 15.904L9 21l5.096-.813a2 2 0 001.317-.685l7.525-7.525a2.121 2.121 0 10-3-3l-7.525 7.525a2 2 0 00-.685 1.317zM4.5 18H15M4.5 13.5H12m-7.5-9h15"/></svg>` },
-      { id: 'dialogue', label: '對話', enLabel: 'Dialogue', type: 'additional', maxItems: 10, color: 'bg-sky-100/90 border-sky-400 text-sky-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>` },
-      { id: 'connective', label: '連接詞', enLabel: 'Connectives', type: 'additional', maxItems: 10, color: 'bg-stone-100/90 border-stone-400 text-stone-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>` }
+      { id: 'time', label: '時間', enLabel: 'Time', type: 'core', maxItems: 1, color: 'bg-amber-100/90 border-amber-400 text-amber-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>` },
+      { id: 'character', label: '人物', enLabel: 'Character', type: 'core', maxItems: 1, color: 'bg-blue-100/90 border-blue-400 text-blue-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>` },
+      { id: 'place', label: '地點', enLabel: 'Place', type: 'core', maxItems: 1, color: 'bg-emerald-100/90 border-emerald-400 text-emerald-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>` },
+      { id: 'setting', label: '背景', enLabel: 'Setting', type: 'core', maxItems: 1, color: 'bg-teal-100/90 border-teal-400 text-teal-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>` },
+      { id: 'problem', label: '起因', enLabel: 'Problem', type: 'core', maxItems: 1, dataKey: 'cause', color: 'bg-red-100/90 border-red-400 text-red-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>` },
+      { id: 'internalresponse', label: '反應', enLabel: 'Internal Response', type: 'core', maxItems: 1, color: 'bg-indigo-100/90 border-indigo-400 text-indigo-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9.5 2A2.5 2.5 0 0112 4.5v15a2.5 2.5 0 01-4.96-.44M14.5 2A2.5 2.5 0 0012 4.5v15a2.5 2.5 0 004.96-.44"/></svg>` },
+      { id: 'plan', label: '計劃', enLabel: 'Plan', type: 'core', maxItems: 1, color: 'bg-cyan-100/90 border-cyan-400 text-cyan-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 14h6M9 18h6M10 10h4"/></svg>` },
+      { id: 'attempt', label: '行動', enLabel: 'Attempt', type: 'core', maxItems: 1, color: 'bg-orange-100/90 border-orange-400 text-orange-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>` },
+      { id: 'consequence', label: '結果', enLabel: 'Consequence', type: 'core', maxItems: 1, color: 'bg-rose-100/90 border-rose-400 text-rose-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></svg>` },
+      { id: 'feelings', label: '感受', enLabel: 'Feelings', type: 'core', maxItems: 1, color: 'bg-pink-100/90 border-pink-400 text-pink-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>` },
+      { id: 'reflection', label: '反思/道理', enLabel: 'Reflection', type: 'core', maxItems: 1, color: 'bg-violet-100/90 border-violet-400 text-violet-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>` },
+      { id: 'thought', label: '想法', enLabel: 'Thought', type: 'additional', maxItems: 1, color: 'bg-fuchsia-100/90 border-fuchsia-400 text-fuchsia-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9.813 15.904L9 21l5.096-.813a2 2 0 001.317-.685l7.525-7.525a2.121 2.121 0 10-3-3l-7.525 7.525a2 2 0 00-.685 1.317zM4.5 18H15M4.5 13.5H12m-7.5-9h15"/></svg>` },
+      { id: 'dialogue', label: '對話', enLabel: 'Dialogue', type: 'additional', maxItems: 1, color: 'bg-sky-100/90 border-sky-400 text-sky-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>` },
+      { id: 'connective', label: '連接詞', enLabel: 'Connectives', type: 'additional', maxItems: 1, color: 'bg-stone-100/90 border-stone-400 text-stone-800', svgPath: `<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>` }
     ];
 
     // --- APP STATE ---
     let selectedElements = ['time', 'character', 'place'];
-    let boxContents = {}; // maps boxId -> Array of objects { emoji, rot }
+    let boxContents = {}; 
 
     ELEMENTS_CONFIG.forEach(elem => {
       boxContents[elem.id] = [];
     });
 
-    // --- AUDIO SYSTEM (From Analysis) ---
+    // --- AUDIO SYSTEM ---
     let audioCtx = null;
 
     const initAudio = () => {
@@ -248,17 +258,12 @@
       } catch(e) { console.error(e); }
     }
 
-    // 1. Click Sound (800Hz sine wave)
     function playClickSound() { playTone(800, 'sine', 0.1, 0.05); }
-    // 2. Spinning Ticks (1200Hz triangle)
-    function playSpinTick() { playTone(1200, 'triangle', 0.05, 0.02); }
-    // 3. Success Chime (C5, E5, G5)
     function playSuccessSound() {
       playTone(523.25, 'sine', 0.15, 0.1); 
       setTimeout(() => playTone(659.25, 'sine', 0.15, 0.1), 100); 
       setTimeout(() => playTone(783.99, 'sine', 0.3, 0.1), 200); 
     }
-    // 4. Victory Fanfare (7-note scale)
     function playWinSound() {
       [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
         setTimeout(() => playTone(freq, i%2===0 ? 'square':'triangle', 0.4, 0.1), i * 100);
@@ -273,6 +278,18 @@
           <div style="display: none;" class="w-full h-full text-current">${fallbackSvg}</div>
         </div>
       `;
+    };
+
+    // Global Function to Update Max Items from Input Fields
+    window.updateMaxItems = function(id, value) {
+      const config = ELEMENTS_CONFIG.find(c => c.id === id);
+      if (config) {
+        // Changed fallback to 1 to match the new defaults
+        let val = parseInt(value) || 1; 
+        if (val < 1) val = 1;
+        if (val > 25) val = 25;
+        config.maxItems = val;
+      }
     };
 
     // --- VIEW MANAGEMENT ---
@@ -303,41 +320,51 @@
 
       ELEMENTS_CONFIG.forEach(config => {
         const isSelected = selectedElements.includes(config.id);
-        const button = document.createElement('button');
-        
-        button.className = `tactile-btn flex items-center p-3.5 rounded-2xl border-2 text-left ${
+        const wrapper = document.createElement('div');
+        wrapper.className = `tactile-btn flex flex-col sm:flex-row items-center p-3.5 rounded-2xl border-2 ${
           isSelected 
             ? `${config.color.split(' ')[0]} ${config.color.split(' ')[1]} shadow-md scale-[1.02]` 
             : 'bg-sky-50/50 border-sky-100/60 text-sky-900 hover:bg-sky-100/50'
         }`;
 
-        button.innerHTML = `
-          <div class="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-md mr-3 sm:mr-4 flex-shrink-0 ${isSelected ? 'bg-white shadow-sm' : 'bg-sky-100/50'}">
-            ${isSelected ? `<svg class="w-4 h-4 sm:w-5 sm:h-5 ${config.color.split(' ')[2]}" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>` : ''}
+        wrapper.innerHTML = `
+          <div class="flex items-center flex-1 w-full cursor-pointer" onclick="toggleElementSelection('${config.id}')">
+            <div class="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-md mr-3 sm:mr-4 flex-shrink-0 ${isSelected ? 'bg-white shadow-sm' : 'bg-sky-100/50'}">
+              ${isSelected ? `<svg class="w-4 h-4 sm:w-5 sm:h-5 ${config.color.split(' ')[2]}" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>` : ''}
+            </div>
+            <div class="flex items-center space-x-3 overflow-hidden select-none">
+              ${renderIconHTML(config.id, config.svgPath)}
+              <span class="font-bold text-lg whitespace-nowrap">${config.label}</span>
+            </div>
           </div>
-          <div class="flex items-center space-x-3 overflow-hidden select-none">
-            ${renderIconHTML(config.id, config.svgPath)}
-            <span class="font-bold text-lg whitespace-nowrap">${config.label}</span>
+          
+          <!-- Number Input Field for Maximum Items -->
+          <div class="mt-3 sm:mt-0 sm:ml-auto flex items-center justify-between w-full sm:w-auto" onclick="event.stopPropagation()">
+            <label class="text-xs text-slate-500 font-bold mr-2 sm:hidden uppercase tracking-wider">上限 (Max Elements)</label>
+            <div class="flex flex-col items-center sm:items-end">
+              <label class="text-[10px] text-slate-500 font-bold mb-0.5 hidden sm:block uppercase tracking-wider">上限 (Max)</label>
+              <input type="number" min="1" max="25" value="${config.maxItems}" class="w-16 p-1 text-center rounded-lg border border-slate-300 text-slate-800 font-black bg-white shadow-inner focus:outline-none focus:border-indigo-400" onchange="window.updateMaxItems('${config.id}', this.value)" />
+            </div>
           </div>
         `;
 
-        button.addEventListener('click', () => {
-          playClickSound(); // Added SFX
-          if (selectedElements.includes(config.id)) {
-            selectedElements = selectedElements.filter(e => e !== config.id);
-          } else {
-            selectedElements.push(config.id);
-          }
-          renderMenuSelection();
-          updateStartButtonState();
-        });
-
         if (config.type === 'core') {
-          coreGrid.appendChild(button);
+          coreGrid.appendChild(wrapper);
         } else {
-          additionalGrid.appendChild(button);
+          additionalGrid.appendChild(wrapper);
         }
       });
+    };
+
+    window.toggleElementSelection = (id) => {
+      playClickSound(); 
+      if (selectedElements.includes(id)) {
+        selectedElements = selectedElements.filter(e => e !== id);
+      } else {
+        selectedElements.push(id);
+      }
+      renderMenuSelection();
+      updateStartButtonState();
     };
 
     const updateStartButtonState = () => {
@@ -364,10 +391,9 @@
         const card = document.createElement('div');
         card.id = `box-card-${config.id}`;
         card.className = `tactile-btn relative flex flex-col rounded-2xl border-4 ${config.color} shadow-lg overflow-hidden min-h-[170px] sm:min-h-[210px] select-none touch-manipulation transition-all hover:shadow-xl active:translate-y-2 active:shadow-none`;
-        card.dataset.isSpinning = "false"; // State for slot mechanic
-
-        const rowClass = config.maxItems === 5 ? 'grid-rows-1' : 'grid-rows-2';
-
+        
+        const numRows = Math.max(1, Math.ceil(config.maxItems / 5));
+        
         card.innerHTML = `
           <div class="flex items-center justify-between px-3 py-2 border-b-4 ${config.color.split(' ')[1]} bg-white/70 backdrop-blur-sm z-10">
             <div class="flex items-center space-x-2 sm:space-x-3">
@@ -385,7 +411,7 @@
             </div>
           </div>
 
-          <div id="grid-body-${config.id}" class="flex-1 relative grid grid-cols-5 ${rowClass} p-3 gap-2 bg-white/50 hover:bg-white/75 transition-colors cursor-pointer">
+          <div id="grid-body-${config.id}" class="flex-1 relative grid grid-cols-5 gap-2 p-3 bg-white/50 hover:bg-white/75 transition-colors cursor-pointer" style="grid-template-rows: repeat(${numRows}, minmax(50px, 1fr))">
             ${Array.from({ length: config.maxItems }).map((_, index) => `
               <div id="slot-${config.id}-${index}" class="flex items-center justify-center relative w-full h-full min-h-[50px] overflow-visible"></div>
             `).join('')}
@@ -394,63 +420,39 @@
 
         grid.appendChild(card);
 
-        // Bind Clear functionality
         const clearBtn = card.querySelector(`#clear-btn-${config.id}`);
         clearBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          playClickSound(); // Added SFX
+          playClickSound(); 
           boxContents[config.id] = [];
           updateBoxDisplay(config.id);
         });
 
-        // VFX & SFX: Spin and Motion Blur Mechanics
         const body = card.querySelector(`#grid-body-${config.id}`);
         body.addEventListener('click', () => {
-          if (card.dataset.isSpinning === "true") return; // Prevent double click
           const currentEmojis = boxContents[config.id];
           if (currentEmojis.length >= config.maxItems) {
-            playClickSound(); // Just a basic tap if full
+            playClickSound(); 
             return;
           }
 
-          card.dataset.isSpinning = "true";
           const slotIndex = currentEmojis.length;
-          const slotEl = document.getElementById(`slot-${config.id}-${slotIndex}`);
-          
-          // Setup spin visual
-          slotEl.innerHTML = `<span class="text-4xl sm:text-5xl md:text-6xl drop-shadow-md inline-block">❓</span>`;
-          const spanEl = slotEl.querySelector('span');
-
           const emojiPool = EMOJI_DATA[config.dataKey || config.id] || ['❓'];
-          let ticks = 0;
-          const maxTicks = 15; // Speed of slot machine spin
-
-          const spinInterval = setInterval(() => {
-            const randomEmoji = emojiPool[Math.floor(Math.random() * emojiPool.length)];
-            spanEl.innerText = randomEmoji;
-            // Motion Blur Effect
-            spanEl.style.transform = `translateY(${Math.random() * 12 - 6}px)`;
-            
-            if (ticks % 2 === 0) playSpinTick(); // SFX: Spin Ticks
-            ticks++;
-
-            if (ticks >= maxTicks) {
-              clearInterval(spinInterval);
-              
-              // Select Final and define randomized rotation (VFX feature)
-              const finalEmoji = emojiPool[Math.floor(Math.random() * emojiPool.length)];
-              const finalRot = (Math.random() * 30 - 15).toFixed(2); // Random -15deg to 15deg
-              
-              currentEmojis.push({ emoji: finalEmoji, rot: finalRot });
-              
-              playSuccessSound(); // SFX: Success Chime
-              card.dataset.isSpinning = "false";
-              updateBoxDisplay(config.id, slotIndex); // Re-render with animations
-            }
-          }, 80);
+          
+          const finalEmoji = emojiPool[Math.floor(Math.random() * emojiPool.length)];
+          const finalRot = (Math.random() * 30 - 15).toFixed(2); 
+          
+          currentEmojis.push({ 
+            emoji: '⭐', 
+            hiddenEmoji: finalEmoji, 
+            rot: finalRot,
+            revealed: false 
+          });
+          
+          playClickSound();
+          updateBoxDisplay(config.id, slotIndex); 
         });
 
-        // Initialize display
         updateBoxDisplay(config.id);
       });
     };
@@ -467,24 +469,18 @@
         clearBtn.classList.add('hidden');
       }
 
-      // VFX: Visual Scaffolding & Prompts (Pulsing glowing border when not complete)
       if (contents.length < config.maxItems) {
         card.classList.add('highlight-glow');
       } else {
         card.classList.remove('highlight-glow');
       }
 
-      // Populate grid
       for (let i = 0; i < config.maxItems; i++) {
         const slot = document.getElementById(`slot-${boxId}-${i}`);
         
-        // Skip modifying inner HTML of slots currently spinning
-        if (card.dataset.isSpinning === "true" && i === contents.length) continue;
-
         slot.innerHTML = '';
         if (contents[i]) {
           const span = document.createElement('span');
-          // VFX: Apply the pop-rotate class if it was just spawned
           span.className = `text-4xl sm:text-5xl md:text-6xl drop-shadow-md inline-block select-none pointer-events-none ${i === animateIndex ? 'animate-pop-rotate' : ''}`;
           span.style.setProperty('--rot', `${contents[i].rot}deg`);
           
@@ -496,6 +492,35 @@
         }
       }
     };
+
+    // --- REVEAL ALL LOGIC ---
+    document.getElementById('reveal-btn').addEventListener('click', () => {
+      let triggeredReveal = false;
+      
+      ELEMENTS_CONFIG.forEach(config => {
+        if (selectedElements.includes(config.id)) {
+          let updatedBox = false;
+          boxContents[config.id].forEach(item => {
+            if (!item.revealed) {
+              item.emoji = item.hiddenEmoji;
+              item.revealed = true;
+              updatedBox = true;
+              triggeredReveal = true;
+            }
+          });
+          
+          if (updatedBox) {
+            updateBoxDisplay(config.id, -1);
+          }
+        }
+      });
+      
+      if (triggeredReveal) {
+        playSuccessSound();
+      } else {
+        playClickSound(); 
+      }
+    });
 
     // --- CELEBRATION CONFLICTS / EFFECT SYSTEMS ---
 
@@ -515,7 +540,6 @@
       }
     };
 
-    // VFX: Confetti Canvas implementation from Analysis
     const confettiCanvas = document.getElementById('confetti-canvas');
     const ctx = confettiCanvas.getContext('2d');
     let confettiParticles = [];
@@ -555,7 +579,7 @@
         p.tiltAngle += p.tiltAngleInc;
         p.y += (Math.cos(p.tiltAngle) + 1 + p.r / 2) / 2;
         p.x += Math.sin(p.tiltAngle) * 2;
-        p.dy += 0.2; // gravity
+        p.dy += 0.2; 
         p.x += p.dx;
         p.y += p.dy;
 
@@ -591,34 +615,32 @@
     });
 
     document.getElementById('finish-btn').addEventListener('click', () => {
-      playWinSound(); // SFX: Victory Fanfare
-      spawnEmojiRain();
-      startConfetti(); // VFX: Massive visual reward
+      playWinSound();
       document.getElementById('celebration-modal').classList.remove('hidden');
+      spawnEmojiRain();
+      startConfetti();
     });
 
-    // Modal Actions
     document.getElementById('modal-back-btn').addEventListener('click', () => {
       playClickSound();
-      stopConfetti();
       document.getElementById('celebration-modal').classList.add('hidden');
+      stopConfetti();
     });
 
     document.getElementById('modal-reset-btn').addEventListener('click', () => {
       playClickSound();
-      stopConfetti();
       document.getElementById('celebration-modal').classList.add('hidden');
-      // Reset all boards
-      ELEMENTS_CONFIG.forEach(elem => boxContents[elem.id] = []);
-      showView('menu');
+      stopConfetti();
+      ELEMENTS_CONFIG.forEach(config => {
+        boxContents[config.id] = [];
+        if (selectedElements.includes(config.id)) {
+          updateBoxDisplay(config.id);
+        }
+      });
     });
 
-    // Initialize
-    window.onload = () => {
-      renderMenuSelection();
-      updateStartButtonState();
-      showView('menu');
-    };
+    renderMenuSelection();
+    updateStartButtonState();
   </script>
 </body>
 </html>
